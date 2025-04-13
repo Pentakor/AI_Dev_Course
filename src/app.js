@@ -1,13 +1,14 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
 import pollRoutes from './routes/pollRoutes.js';
+//import result from 'dotenv/config';
 
-const result = require('dotenv').config();
+
 const app = express();
 
-if (result.error) {
-    throw result.error;
-}
+// if (result.error) {
+//     throw result.error;
+// }
 
 app.use(express.json());
 app.use(function (req, res, next) {
