@@ -1,5 +1,6 @@
 import express from 'express';
 import userRoutes from './routes/userRoutes.js';
+import pollRoutes from './routes/pollRoutes.js';
 
 const result = require('dotenv').config();
 const app = express();
@@ -29,6 +30,7 @@ app.use(function (req, res, next) {
 
 // Register routes
 app.use('/api/users', userRoutes);
+app.use('/api/polls', pollRoutes);
 
 
 export default app;

@@ -1,13 +1,18 @@
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
+import * as pollController from '../controller/pollController.js';
 
-// Define your routes here
-router.get('/', (req, res) => {
-    res.send('Welcome to the API!');
-});
+const router = Router();
 
-router.get('/example', (req, res) => {
-    res.send('This is an example route.');
-});
+// Create a new poll
+router.post('/', pollController.createPoll);
 
-module.exports = router;
+// Get all polls
+router.get('/', pollController.getPolls);
+
+// Get polls created by specific user
+router.get('/:username', pollController.getPollsByUser);
+
+// Delete a poll by its ID - in request body - username
+router.delete('/:id', pollController.deletePoll);
+
+export default router;
