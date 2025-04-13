@@ -1,8 +1,11 @@
+import { v4 as uuidv4 } from 'uuid';
+
 /**
  * Represents a poll with a question and multiple options for voting.
  */
 class Poll {
 
+    #id
     #question;
     #options;
     #totalvotes;
@@ -36,6 +39,7 @@ class Poll {
             options.forEach(option => {
                 this.#options.set(option, 0);
             });
+            this.#id = uuidv4(); // Generate a unique ID for the poll
         }
     }
 
@@ -62,6 +66,7 @@ class Poll {
      */
     getData() {
         return {
+            id: this.#id,
             question: this.#question,
             totalVotes: this.#totalvotes,
             results: [...this.#options].map(([key, value]) => ({ option: key, votes: value }))
