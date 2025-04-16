@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import * as userController from '../controller/userController.js';
+import {usernameSchema, voteSchema} from '../validation/zodSchemas.js';
+import { validate } from '../middleware/validationMiddleware.js';
 
 const router = Router();
 
 // Create a new user
-router.post('/', userController.createUser);
+router.post('/', validate(usernameSchema), userController.createUser);
 
 // Vote on a poll
-router.post('/vote/:id', userController.voteOnPoll);
+router.post('/vote/:id',validate(voteSchema) ,userController.voteOnPoll);
 
 // Get polls that the user voted in
 router.get('/voted-by/:username', userController.userVotes);
