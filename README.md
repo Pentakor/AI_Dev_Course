@@ -1,5 +1,3 @@
-Name: David Weiss
-ID: 325483006
 
 # Polls Library
 
