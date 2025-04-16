@@ -9,10 +9,10 @@ router.post('/', pollController.createPoll);
 // Get all polls
 router.get('/', pollController.getPolls);
 
-// Get polls created by specific user
-router.get('/:username', pollController.getPollsByUser);
-
 // Delete a poll by its ID - in request body - username
 router.delete('/:id', pollController.deletePoll);
+
+// Get polls created by specific user
+router.get('/created-by/:username', pollController.getPollsByUser);
 
 export default router;
