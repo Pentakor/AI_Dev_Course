@@ -1,77 +1,47 @@
-import { v4 as uuidv4 } from 'uuid';
+// storage/poll.js
+
+const polls = new Map(); // key: poll.id, value: poll object
 
 /**
- * Represents a poll with a question and multiple options for voting.
+ * Save a new poll to storage.
+ * @param {Object} poll - The poll object to save.
+ * @returns {Promise<void>}
  */
-class Poll {
-
-    #id
-    #question;
-    #options;
-    #totalvotes;
-
-    /**
-     * Creates a new Poll instance.
-     * param {string} question - The question for the poll.
-     * param {string[]} options - An array of options for the poll. Must contain at least two unique options.
-     * throws {Error} If no question is provided.
-     * throws {Error} If no options are provided.
-     * throws {Error} If fewer than two options are provided.
-     * throws {Error} If duplicate options are provided.
-     */
-    constructor(question, options) {
-        if (!question){
-            throw new Error("No question provided.");
-        }
-        else if(!options){
-            throw new Error("No options provided.");
-        }
-        else if(options.length < 2){
-            throw new Error("Minimum two options required.");
-        }
-        else if (new Set(options).size !== options.length) {
-            throw new Error("Duplicate options.");
-        }
-        else{
-            this.#question = question;
-            this.#options = new Map();
-            this.#totalvotes = 0;
-            options.forEach(option => {
-                this.#options.set(option, 0);
-            });
-            this.#id = uuidv4(); // Generate a unique ID for the poll
-        }
-    }
-
-    /**
-     * Casts a vote for a specific option.
-     * param {string} option - The option to vote for.
-     * throws {Error} If the option is invalid or does not exist in the poll.
-     */
-    vote(option) {
-        if (this.#options.has(option)) {
-            this.#options.set(option, this.#options.get(option) + 1);
-            this.#totalvotes++;
-        }
-        else
-        {
-            throw new Error("Invalid option.");
-        }
-    }
-
-    /**
-     * Retrieves the poll data, including the question, total votes, and results.
-     * returns {Object} An object containing the poll question, total votes, and an array of results.
-     * The results array contains objects with `option` and `votes` properties.
-     */
-    getData() {
-        return {
-            id: this.#id,
-            question: this.#question,
-            totalVotes: this.#totalvotes,
-            results: [...this.#options].map(([key, value]) => ({ option: key, votes: value }))
-        };
-    }
+export async function savePoll(poll) {
+  polls.set(poll.id, poll);
 }
 
-export default Poll;
+/**
+ * Get a poll by its ID.
+ * @param {string} id - The UUID of the poll.
+ * @returns {Promise<Object|null>} The poll if found, or null.
+ */
+export async function getPoll(id) {
+  return polls.get(id) || null;
+}
+
+/**
+ * Delete a poll by its ID.
+ * @param {string} id - The UUID of the poll.
+ * @returns {Promise<boolean>} True if deleted, false if not found.
+ */
+export async function deletePoll(id) {
+  return polls.delete(id);
+}
+
+/**
+ * Get all polls from storage.
+ * @returns {Promise<Object[]>} Array of all poll objects.
+ */
+export async function getAllPolls() {
+  return Array.from(polls.values());
+}
+
+/**
+ * Get all polls created by a specific user.
+ * @param {string} username - The creator's username.
+ * @returns {Promise<Object[]>} Array of polls created by the user.
+ */
+export async function getPollsByCreator(username) {
+  return Array.from(polls.values()).filter(poll => poll.creator === username);
+}
