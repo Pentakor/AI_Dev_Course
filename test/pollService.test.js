@@ -5,7 +5,9 @@
  */
 
 import * as pollService from '../src/service/pollService.js';
-import * as pollStorage from '../src/storage/poll.js';
+import * as pollStorage from '../src/Storage/poll.js';
+import * as userService from '../src/service/userService.js';
+import * as userStorage from '../src/Storage/user.js';
 
 describe('pollService (business logic)', () => {
   /**
@@ -14,6 +16,9 @@ describe('pollService (business logic)', () => {
    */
   beforeEach(async () => {
     pollStorage.__resetStorage?.();
+    userStorage.__resetStorage?.();
+    await userService.createUser('Alice');
+    await userService.createUser('Bob');
   });
 
   /**
@@ -73,7 +78,7 @@ describe('pollService (business logic)', () => {
         question: 'Favorite color?',
         options: ['Red', 'Blue']
       })
-    ).rejects.toThrow('User not found');
+    ).rejects.toThrow('Creator does not exist');
   });
 
   /**
@@ -81,6 +86,7 @@ describe('pollService (business logic)', () => {
    * @test
    */
   test('getPolls - returns all polls', async () => {
+
     await pollService.createPoll({
       creator: 'Alice',
       question: 'Question 1?',

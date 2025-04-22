@@ -1,4 +1,5 @@
 import * as pollService from '../service/pollService.js';
+import { getUser } from '../service/userService.js';
 
 /**
  * Controller to handle poll creation.
@@ -15,9 +16,16 @@ export async function createPoll(req, res) {
     const poll = await pollService.createPoll({ creator, question, options });
     res.status(201).json(poll);
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    if (err.message === "Creator does not exist") {
+      res.status(404).json({ error: err.message });
+    } else if (err.message.includes("required")) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
   }
-}
+};
+
 /**
  * Controller to get all polls.
  *
@@ -33,7 +41,7 @@ export async function getPolls(req, res) {
     } catch (err) {
       res.status(500).json({ error: 'Failed to fetch polls' });
     }
-  }
+  };
   /**
  * Controller to get polls created by a specific user.
  *
@@ -43,16 +51,23 @@ export async function getPolls(req, res) {
  * @returns {Promise<void>}
  */
 export async function getPollsByUser(req, res) {
-    try {
-      const { username } = req.params;
-  
-      const polls = await pollService.getPollsByUser(username);
-      res.status(200).json(polls);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch user polls' });
+  try {
+    const { username } = req.params;
+
+    // Check if the username exists
+    const existingUser = await getUser(username);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User does not exist" });
     }
+
+    const polls = await pollService.getPollsByUser(username);
+    res.status(200).json(polls);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch user polls' });
   }
-  /**
+};
+
+/**
  * Controller to delete a poll by ID, only if requested by the creator.
  *
  * @route DELETE /polls/:id
@@ -66,9 +81,8 @@ export async function deletePoll(req, res) {
       const { username } = req.body;
   
       await pollService.deletePoll(id, username);
-      res.status(200).json({ message: 'Poll deleted successfully' });
+      res.status(204).json({ message: 'Poll deleted successfully' });
     } catch (err) {
       res.status(403).json({ error: err.message }); // מחזיר 403 אם המשתמש לא מורשה
     }
-  }
-  
+  };

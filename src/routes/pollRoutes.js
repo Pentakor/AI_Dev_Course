@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as pollController from '../controller/pollController.js';
 import {usernameSchema, pollSchema} from '../validation/zodSchemas.js';
-import { validate } from '../middleware/validationMiddleware.js';
+import validate from '../validation/validateMiddleware.js';
 
 const router = Router();
 
