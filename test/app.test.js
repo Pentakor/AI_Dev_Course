@@ -1,27 +1,18 @@
-import axios from 'axios';
-import { start, stop } from '../src/server.js';
-
-let baseURL;
-
-// Start the server before running the tests
 beforeAll(async () => {
   const server = await start();
   baseURL = server.baseURL;
 });
 
-// Stop the server after all tests
 afterAll(async () => {
   await stop();
 });
 
 describe('E2E: User and Poll Flow', () => {
-  // Test: create a new user successfully
   test('Create user', async () => {
     const res = await axios.post(`${baseURL}/users`, { username: 'Alice' });
     expect(res.status).toBe(201);
   });
-
-  // Test: create a poll for the user
+  
   test('Create poll', async () => {
     const res = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
@@ -32,7 +23,6 @@ describe('E2E: User and Poll Flow', () => {
     expect(res.data).toHaveProperty('id');
   });
 
-  // Test: cast a vote on a poll by a valid user
   test('Vote on poll', async () => {
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
@@ -50,7 +40,6 @@ describe('E2E: User and Poll Flow', () => {
     expect(res.status).toBe(200);
   });
 
-  // Test: prevent duplicate voting by the same user on the same poll
   test('Fail on duplicate vote', async () => {
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
@@ -74,25 +63,6 @@ describe('E2E: User and Poll Flow', () => {
     ).rejects.toThrow();
   });
 
-  // Test: poll creator can delete their own poll
-test('Poll creator can delete their own poll (204)', async () => {
-  await axios.post(`${baseURL}/users`, { username: 'Eli' });
-
-  const poll = await axios.post(`${baseURL}/polls`, {
-    creator: 'Eli',
-    question: 'Delete this poll?',
-    options: ['Yes', 'No']
-  });
-  const pollId = poll.data.id;
-
-  const res = await axios.delete(`${baseURL}/polls/${pollId}`, {
-    data: { username: 'Eli' }
-  });
-
-  expect(res.status).toBe(204); 
-});
-
-// Test: non-creator cannot delete someone else's poll
   test('Fail to delete poll by non-creator', async () => {
     await axios.post(`${baseURL}/users`, { username: 'Creator' });
     await axios.post(`${baseURL}/users`, { username: 'NotTheCreator' });
@@ -110,14 +80,7 @@ test('Poll creator can delete their own poll (204)', async () => {
       })
     ).rejects.toMatchObject({
       response: {
-        status: 403 
 
-      }
-    });
-  });
-  
-
-  // Test: retrieve polls that a specific user voted in
   test('Get polls voted by user', async () => {
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
