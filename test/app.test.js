@@ -5,7 +5,7 @@
  */
 
 import axios from 'axios';
-import { start, stop } from '../../src/server.js';
+import { start, stop } from '../src/server.js';
 
 let baseURL;
 

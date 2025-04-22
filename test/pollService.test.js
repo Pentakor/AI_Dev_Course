@@ -4,8 +4,8 @@
  * @module pollService.test
  */
 
-import * as pollService from '../../src/service/pollService.js';
-import * as pollStorage from '../../src/storage/poll.js';
+import * as pollService from '../src/service/pollService.js';
+import * as pollStorage from '../src/storage/poll.js';
 
 describe('pollService (business logic)', () => {
   /**

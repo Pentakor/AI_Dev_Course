@@ -4,8 +4,8 @@
  * @module userService.test
  */
 
-import * as userService from '../../src/service/userService.js';
-import * as pollService from '../../src/service/pollService.js';
+import * as userService from '../src/service/userService.js';
+import * as pollService from '../src/service/pollService.js';
 
 describe('userService (business logic)', () => {
   /**
