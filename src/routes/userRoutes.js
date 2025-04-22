@@ -1,19 +1,49 @@
-import { Router } from 'express';
-import * as userController from '../controller/userController.js';
-import {usernameSchema, voteSchema} from '../validation/zodSchemas.js';
-import { validate } from '../middleware/validationMiddleware.js';
+import * as userService from '../service/userService.js';
+import * as pollService from '../service/pollService.js';
 
-const router = Router();
+/**
+ * Creates a new user.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function createUser(req, res) {
+  try {
+    const { username } = req.body;
+    const result = await userService.createUser(username);
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
 
-// Create a new user
-router.post('/', validate(usernameSchema), userController.createUser);
+/**
+ * Handles a user's vote on a poll.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function voteOnPoll(req, res) {
+  try {
+    const pollId = req.params.id;
+    const { username, optionId } = req.body;
 
-// Vote on a poll
-router.post('/vote/:id',validate(voteSchema) ,userController.voteOnPoll);
+    const updatedPoll = await pollService.vote(pollId, username, optionId);
+    res.status(200).json(updatedPoll);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+}
 
-// Get polls that the user voted in
-router.get('/voted-by/:username', userController.userVotes);
-
-
-
-export default router;
+/**
+ * Gets all polls that the user voted in.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function userVotes(req, res) {
+  try {
+    const { username } = req.params;
+    const polls = await userService.getVotedPollsByUser(username);
+    res.status(200).json(polls);
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
+}

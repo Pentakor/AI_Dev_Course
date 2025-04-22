@@ -1,12 +1,27 @@
-class User {
-    #username
-    constructor(username) {
-        this.#username = username;
-    }
+// In-memory user storage using a Map
+const users = new Map();
 
-    get name() {
-        return this.#username;
-    }
+/**
+ * Gets a user by username.
+ * @param {string} username
+ * @returns {Promise<string | undefined>}
+ */
+export async function getUser(username) {
+  return users.get(username);
 }
 
-export default User;
+/**
+ * Creates a new user.
+ * @param {string} username
+ * @returns {Promise<void>}
+ */
+export async function createUser(username) {
+  users.set(username, username);
+}
+
+/**
+ * Clears all users — used for testing.
+ */
+export function __resetStorage() {
+  users.clear();
+}
