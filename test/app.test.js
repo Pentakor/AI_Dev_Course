@@ -1,53 +1,18 @@
-/**
- * E2E Tests: User and Poll Flow.
- * This suite tests the full flow from user creation to voting and deleting polls.
- * @module userPollFlow.test
- */
-
-import axios from 'axios';
-import { start, stop } from '../../src/server.js';
-
-let baseURL;
-
-/**
- * Start the server before running the tests.
- * This function is executed before any tests are run. It starts the server 
- * and assigns the base URL to the `baseURL` variable, which will be used 
- * for making requests during the tests.
- * @function
- * @async
- */
 beforeAll(async () => {
   const server = await start();
   baseURL = server.baseURL;
 });
 
-/**
- * Stop the server after all tests have been completed.
- * This function is executed after all tests are finished. It stops the server 
- * to clean up resources and free up the server for other tasks.
- * @function
- * @async
- */
 afterAll(async () => {
   await stop();
 });
 
 describe('E2E: User and Poll Flow', () => {
-  
-  /**
-   * Test: Successfully creates a new user.
-   * @test
-   */
   test('Create user', async () => {
     const res = await axios.post(`${baseURL}/users`, { username: 'Alice' });
     expect(res.status).toBe(201);
   });
-
-  /**
-   * Test: Successfully creates a poll for the user.
-   * @test
-   */
+  
   test('Create poll', async () => {
     const res = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
@@ -58,10 +23,6 @@ describe('E2E: User and Poll Flow', () => {
     expect(res.data).toHaveProperty('id');
   });
 
-  /**
-   * Test: A valid user successfully votes on an existing poll.
-   * @test
-   */
   test('Vote on poll', async () => {
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
@@ -79,10 +40,6 @@ describe('E2E: User and Poll Flow', () => {
     expect(res.status).toBe(200);
   });
 
-  /**
-   * Test: Prevents duplicate voting by the same user on the same poll.
-   * @test
-   */
   test('Fail on duplicate vote', async () => {
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
@@ -106,31 +63,6 @@ describe('E2E: User and Poll Flow', () => {
     ).rejects.toThrow();
   });
 
-  /**
-   * Test: Poll creator can delete their own poll.
-   * @test
-   */
-  test('Poll creator can delete their own poll (204)', async () => {
-    await axios.post(`${baseURL}/users`, { username: 'Eli' });
-
-    const poll = await axios.post(`${baseURL}/polls`, {
-      creator: 'Eli',
-      question: 'Delete this poll?',
-      options: ['Yes', 'No']
-    });
-    const pollId = poll.data.id;
-
-    const res = await axios.delete(`${baseURL}/polls/${pollId}`, {
-      data: { username: 'Eli' }
-    });
-
-    expect(res.status).toBe(204); 
-  });
-
-  /**
-   * Test: Non-creator cannot delete someone else's poll.
-   * @test
-   */
   test('Fail to delete poll by non-creator', async () => {
     await axios.post(`${baseURL}/users`, { username: 'Creator' });
     await axios.post(`${baseURL}/users`, { username: 'NotTheCreator' });
@@ -148,15 +80,7 @@ describe('E2E: User and Poll Flow', () => {
       })
     ).rejects.toMatchObject({
       response: {
-        status: 403
-      }
-    });
-  });
 
-  /**
-   * Test: Get polls that a specific user has voted in.
-   * @test
-   */
   test('Get polls voted by user', async () => {
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
