@@ -1,7 +1,7 @@
 // storage/poll.js
 export function __resetStorage() {
   polls.clear();
-}
+};
 const polls = new Map(); // key: poll.id, value: poll object
 
 /**
@@ -11,7 +11,7 @@ const polls = new Map(); // key: poll.id, value: poll object
  */
 export async function savePoll(poll) {
   polls.set(poll.id, poll);
-}
+};
 
 /**
  * Get a poll by its ID.
@@ -20,7 +20,7 @@ export async function savePoll(poll) {
  */
 export async function getPoll(id) {
   return polls.get(id) || null;
-}
+};
 
 /**
  * Delete a poll by its ID.
@@ -29,7 +29,7 @@ export async function getPoll(id) {
  */
 export async function deletePoll(id) {
   return polls.delete(id);
-}
+};
 
 /**
  * Get all polls from storage.
@@ -37,7 +37,7 @@ export async function deletePoll(id) {
  */
 export async function getAllPolls() {
   return Array.from(polls.values());
-}
+};
 
 /**
  * Get all polls created by a specific user.
@@ -46,4 +46,4 @@ export async function getAllPolls() {
  */
 export async function getPollsByCreator(username) {
   return Array.from(polls.values()).filter(poll => poll.creator === username);
-}
+};

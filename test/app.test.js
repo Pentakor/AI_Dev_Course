@@ -5,8 +5,9 @@
  */
 
 import axios from 'axios';
-import { start, stop } from '../src/server.js';
+import app from '../src/app.js';
 
+let server;
 let baseURL;
 
 /**
@@ -18,8 +19,11 @@ let baseURL;
  * @async
  */
 beforeAll(async () => {
-  const server = await start();
-  baseURL = server.baseURL;
+  const PORT = 3000; // Use a test-specific port
+  server = app.listen(PORT, () => {
+    console.log(`Test server is running on port ${PORT}`);
+  });
+  baseURL = `http://localhost:${PORT}/api`;
 });
 
 /**
@@ -30,7 +34,19 @@ beforeAll(async () => {
  * @async
  */
 afterAll(async () => {
-  await stop();
+  if (server) {
+    await new Promise((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          console.error('Error stopping the test server:', error);
+          reject(error);
+        } else {
+          console.log('Test server stopped successfully');
+          resolve();
+        }
+      });
+    });
+  }
 });
 
 describe('E2E: User and Poll Flow', () => {
@@ -158,6 +174,7 @@ describe('E2E: User and Poll Flow', () => {
    * @test
    */
   test('Get polls voted by user', async () => {
+ 
     const poll = await axios.post(`${baseURL}/polls`, {
       creator: 'Alice',
       question: 'Front-end framework?',
@@ -172,9 +189,11 @@ describe('E2E: User and Poll Flow', () => {
       optionId: 0
     });
 
-    const res = await axios.get(`${baseURL}/users/voted-by/Dana`);
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.data)).toBe(true);
-    expect(res.data.length).toBeGreaterThan(0);
+   
+      const res = await axios.get(`${baseURL}/users/voted-by/Dana`);
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.data)).toBe(true);
+      expect(res.data.length).toBeGreaterThan(0);
+   
   });
 });

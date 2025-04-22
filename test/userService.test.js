@@ -6,6 +6,8 @@
 
 import * as userService from '../src/service/userService.js';
 import * as pollService from '../src/service/pollService.js';
+import * as userStorage from '../src/Storage/user.js';
+import * as pollStorage from '../src/Storage/poll.js';
 
 describe('userService (business logic)', () => {
   /**
@@ -13,8 +15,8 @@ describe('userService (business logic)', () => {
    * @function
    */
   beforeEach(async () => {
-    userService.__resetStorage?.();
-    pollService.__resetStorage?.();
+    userStorage.__resetStorage?.();
+    pollStorage.__resetStorage?.();
   });
 
   /**
@@ -32,7 +34,7 @@ describe('userService (business logic)', () => {
    */
   test('createUser - fails with duplicate username', async () => {
     await userService.createUser('John Weiss');
-    await expect(userService.createUser('John Weiss')).rejects.toThrow('Username already exists');
+    await expect(userService.createUser('John Weiss')).rejects.toThrow('User already exists');
   });
 
   /**
@@ -47,7 +49,7 @@ describe('userService (business logic)', () => {
       options: ['React', 'Vue']
     });
 
-    const result = await pollService.vote(poll.id, 'Sapir', 0);
+    const result = await userService.voteOnPoll(poll.id, 'Sapir', 0);
     expect(result.votes['Sapir']).toBe(0);
   });
 
@@ -56,6 +58,7 @@ describe('userService (business logic)', () => {
    * @test
    */
   test('vote - user votes successfully', async () => {
+    await userService.createUser('Alice');
     const poll = await pollService.createPoll({
       creator: 'Alice',
       question: 'Pick a fruit',
@@ -63,7 +66,7 @@ describe('userService (business logic)', () => {
     });
 
     await userService.createUser('Bob');
-    const result = await userService.vote(poll.id, 'Bob', 0);
+    const result = await userService.voteOnPoll(poll.id, 'Bob', 0);
 
     expect(result.votes['Bob']).toBe(0);
   });
@@ -73,6 +76,7 @@ describe('userService (business logic)', () => {
    * @test
    */
   test('vote - fails for non-existing user', async () => {
+    await userService.createUser('Alice');
     const poll = await pollService.createPoll({
       creator: 'Alice',
       question: 'Favorite color?',
@@ -80,8 +84,8 @@ describe('userService (business logic)', () => {
     });
 
     await expect(
-      pollService.vote(poll.id, 'GhostUser', 1)
-    ).rejects.toThrow('User not found');
+      userService.voteOnPoll(poll.id, 'GhostUser', 1)
+    ).rejects.toThrow("User does not exist");
   });
 
   /**
@@ -92,7 +96,7 @@ describe('userService (business logic)', () => {
     await userService.createUser('Dana');
 
     await expect(
-      pollService.vote('non-existing-id', 'Dana', 0)
+      userService.voteOnPoll('non-existing-id', 'Dana', 0)
     ).rejects.toThrow('Poll not found');
   });
 
@@ -109,7 +113,7 @@ describe('userService (business logic)', () => {
     });
 
     await expect(
-      pollService.vote(poll.id, 'Eli', 5)
+      userService.voteOnPoll(poll.id, 'Eli', 5)
     ).rejects.toThrow('Invalid option index');
   });
 
@@ -125,10 +129,10 @@ describe('userService (business logic)', () => {
       options: ['Coffee', 'Tea']
     });
 
-    await pollService.vote(poll.id, 'Tomer', 1);
+    await userService.voteOnPoll(poll.id, 'Tomer', 1);
 
     await expect(
-      pollService.vote(poll.id, 'Tomer', 0)
+      userService.voteOnPoll(poll.id, 'Tomer', 0)
     ).rejects.toThrow('User has already voted');
   });
 
@@ -137,17 +141,19 @@ describe('userService (business logic)', () => {
    * @test
    */
   test('vote - fails if poll is deleted', async () => {
+    await userService.createUser('Bob');
+    await userService.createUser('Alice');
     const poll = await pollService.createPoll({
       creator: 'Alice',
       question: 'Choose your fruit',
       options: ['Apple', 'Banana']
     });
-    const pollId = poll.data.id;
+    const pollId = poll.id;
 
     await pollService.deletePoll(pollId, 'Alice');
 
     await expect(
-      userService.vote(pollId, 'Bob', 0)
+      userService.voteOnPoll(pollId, 'Bob', 0)
     ).rejects.toThrow('Poll not found');
   });
 
@@ -168,8 +174,8 @@ describe('userService (business logic)', () => {
       options: ['Red', 'Green']
     });
 
-    await pollService.vote(poll1.id, 'Lea', 0);
-    await pollService.vote(poll2.id, 'Lea', 1);
+    await userService.voteOnPoll(poll1.id, 'Lea', 0);
+    await userService.voteOnPoll(poll2.id, 'Lea', 1);
 
     const votedPolls = await userService.getVotedPollsByUser('Lea');
     expect(votedPolls.length).toBe(2);

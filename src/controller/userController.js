@@ -1,16 +1,74 @@
 import * as userService from '../service/userService.js';
+import * as pollService from '../service/pollService.js';
 
 /**
  * Creates a new user.
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-export async function createUser(req, res) {
+export const createUser = async (req, res) => {
+  const { username } = req.body;
+
   try {
-    const { username } = req.body;
-    const result = await userService.createUser(username);
-    res.status(201).json(result);
+    const existingUser = await userService.getUser(username);
+    if (existingUser) {
+      return res.status(409).json({ error: 'Username already exists' });
+    }
+
+    const newUser = await userService.createUser(username);
+    return res.status(201).json({ message: 'User created', user: newUser });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    console.error('Error in createUser controller:', err);
+    return res.status(500).json({ error: 'Internal server error' });
   }
-}
+};
+
+
+/**
+ * Handles a user's vote on a poll.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function voteOnPoll(req, res) {
+  try {
+    const pollId = req.params.id;
+    const { username, optionId } = req.body;
+
+    const updatedPoll = await userService.voteOnPoll(pollId, username, optionId);
+    res.status(200).json(updatedPoll);
+  } catch (err) {
+    if (err.message === "Poll not found") {
+      res.status(404).json({ error: err.message });
+    } else if (
+      err.message === "Invalid option index" ||
+      err.message === "User has already voted" ||
+      err.message === "Poll ID is required and must be a string" ||
+      err.message === "Username is required and must be a string" ||
+      err.message === "Option index is required and must be a non-negative number"
+    ) {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+};
+
+/**
+ * Gets all polls that the user voted in.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+export async function userVotes(req, res) {
+  try {
+    const { username } = req.params;
+    const polls = await userService.getVotedPollsByUser(username);
+    res.status(200).json(polls);
+  } catch (err) {
+    if (err.message === "Username is required and must be a string") {
+      res.status(400).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Internal server error" });
+    }
+  }
+};
+

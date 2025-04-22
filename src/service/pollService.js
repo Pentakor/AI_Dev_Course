@@ -5,7 +5,9 @@ import {
   getPollsByCreator,
   getPoll, 
   deletePoll as deletePollFromStorage
-} from '../storage/poll.js';
+} from '../Storage/poll.js';
+import { getUser } from '../service/userService.js';
+
 /**
  * Creates a new poll and saves it to the storage.
  *
@@ -22,6 +24,13 @@ export async function createPoll({ creator, question, options }) {
   if (!creator || typeof creator !== 'string') {
     throw new Error("Creator is required and must be a string");
   }
+
+  // Check if the creator exists
+  const existingUser = await getUser(creator);
+  if (!existingUser) {
+    throw new Error("Creator does not exist");
+  }
+
   if (!question || typeof question !== 'string') {
     throw new Error("Question is required and must be a string");
   }
@@ -42,7 +51,7 @@ export async function createPoll({ creator, question, options }) {
 
   await savePoll(newPoll);
   return newPoll;
-}
+};
 
 /**
  * Retrieves all polls from storage.
@@ -52,7 +61,7 @@ export async function createPoll({ creator, question, options }) {
  */
 export async function getPolls() {
   return await getAllPolls();
-}
+};
 /**
  * Retrieves all polls created by a specific user.
  *
@@ -67,7 +76,7 @@ export async function getPollsByUser(username) {
     }
   
     return await getPollsByCreator(username);
-  }
+  };
  
   /**
    * Deletes a poll by its ID if the requesting user is the creator.
@@ -102,5 +111,5 @@ export async function getPollsByUser(username) {
   
     // Delete the poll from storage
     await deletePollFromStorage(id);
-  }
-  
+  };
+
