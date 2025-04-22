@@ -2,11 +2,10 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   savePoll,
   getAllPolls,
-  getPollsByCreator ,
+  getPollsByCreator,
+  getPoll, 
   deletePoll as deletePollFromStorage
-
-} from '../storage/poll.js'; 
-
+} from '../storage/poll.js';
 /**
  * Creates a new poll and saves it to the storage.
  *
@@ -69,11 +68,7 @@ export async function getPollsByUser(username) {
   
     return await getPollsByCreator(username);
   }
-  import {
-    getPoll,
-    deletePoll as deletePollFromStorage
-  } from '../storage/poll.js';
-  
+ 
   /**
    * Deletes a poll by its ID if the requesting user is the creator.
    *

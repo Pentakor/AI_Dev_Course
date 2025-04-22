@@ -1,5 +1,7 @@
 // storage/poll.js
-
+export function __resetStorage() {
+  polls.clear();
+}
 const polls = new Map(); // key: poll.id, value: poll object
 
 /**
