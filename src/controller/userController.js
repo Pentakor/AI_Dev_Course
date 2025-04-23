@@ -23,13 +23,12 @@ export const createUser = async (req, res) => {
   }
 };
 
-
 /**
  * Handles a user's vote on a poll.
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-export async function voteOnPoll(req, res) {
+export const voteOnPoll = async (req, res) => {
   try {
     const pollId = req.params.id;
     const { username, optionId } = req.body;
@@ -58,7 +57,7 @@ export async function voteOnPoll(req, res) {
  * @param {import('express').Request} req
  * @param {import('express').Response} res
  */
-export async function userVotes(req, res) {
+export const userVotes = async (req, res) => {
   try {
     const { username } = req.params;
     const polls = await userService.getVotedPollsByUser(username);

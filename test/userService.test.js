@@ -24,8 +24,9 @@ describe('userService (business logic)', () => {
    * @test
    */
   test('createUser - creates new user', async () => {
-    const user = await userService.createUser('John Weiss');
-    expect(user.username).toBe('John Weiss');
+    await userService.createUser('John Weiss');
+    const user = await userService.getUser('John Weiss');
+    expect(user).toBe('John Weiss');
   });
 
   /**
@@ -183,4 +184,4 @@ describe('userService (business logic)', () => {
   });
 });
 
-  
+
