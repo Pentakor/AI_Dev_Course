@@ -5,16 +5,34 @@ import validate from '../validation/validateMiddleware.js';
 
 const router = Router();
 
-// Create a new poll
+/**
+ * Creates a new poll.
+ * 
+ * @route POST /api/polls
+ * @returns {Promise<Object>} Created poll object
+ */
 router.post('/', validate(pollSchema), pollController.createPoll);
 
-// Get all polls
+/**
+ * @route GET /api/polls
+ * @returns {Promise<Object[]>} Array of all polls
+ */
 router.get('/', pollController.getPolls);
 
-// Delete a poll by its ID - in request body - username
+/**
+ * Deletes a poll (only allowed by creator).
+ * 
+ * @route DELETE /api/polls/:id
+ * @returns {Promise<void>} No content
+ */
 router.delete('/:id', validate(usernameSchema), pollController.deletePoll);
 
-// Get polls created by specific user
+/**
+ * Gets polls created by a specific user.
+ * 
+ * @route GET /api/polls/created-by/:username
+ * @returns {Promise<Object[]>} Array of polls created by the user
+ */
 router.get('/created-by/:username', pollController.getPollsByUser);
 
 export default router;

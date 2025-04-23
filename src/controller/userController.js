@@ -1,10 +1,11 @@
 import * as userService from '../service/userService.js';
-import * as pollService from '../service/pollService.js';
 
 /**
  * Creates a new user.
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @route POST /api/users
+ * @param {Object} req - Express request object containing `username` in body
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
  */
 export const createUser = async (req, res) => {
   const { username } = req.body;
@@ -25,8 +26,10 @@ export const createUser = async (req, res) => {
 
 /**
  * Handles a user's vote on a poll.
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * @route POST /api/users/vote/:id
+ * @param {Object} req - Express request object with `username`, `optionId` in body and `id` in params
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
  */
 export const voteOnPoll = async (req, res) => {
   try {
@@ -53,9 +56,11 @@ export const voteOnPoll = async (req, res) => {
 };
 
 /**
- * Gets all polls that the user voted in.
- * @param {import('express').Request} req
- * @param {import('express').Response} res
+ * Gets all polls that a specific user has voted in.
+ * @route GET /api/users/voted-by/:username
+ * @param {Object} req - Express request object containing `username` in params
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
  */
 export const userVotes = async (req, res) => {
   try {

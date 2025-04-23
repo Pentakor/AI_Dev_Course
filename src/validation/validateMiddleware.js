@@ -1,5 +1,14 @@
 import { ZodError } from 'zod';
 
+/**
+ * Express middleware to validate request bodies using a Zod schema.
+ * 
+ * @param {Object} schema - A Zod schema object
+ * @returns {Function} Middleware function for Express
+ *
+ * @example
+ * router.post('/users', validate(userSchema), createUser);
+ */
 const validate = (schema) => {
   return (req, res, next) => {
     try {

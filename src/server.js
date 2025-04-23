@@ -1,6 +1,9 @@
-import app from '../app.js';
-
-//const app = express();
+import app from './app.js';
+/**
+ * Application entry point.
+ * 
+ * Starts the Express server on the specified port.
+ */
 const PORT = process.env.PORT || 3000;
 
 (async () => {
