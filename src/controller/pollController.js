@@ -9,7 +9,7 @@ import { getUser } from '../service/userService.js';
  * @param {import('express').Response} res - Express response object used to return the created poll or an error.
  * @returns {Promise<void>}
  */
-export async function createPoll(req, res) {
+export const createPoll = async (req, res) => {
   try {
     const { creator, question, options } = req.body;
 
@@ -34,15 +34,16 @@ export async function createPoll(req, res) {
  * @param {import('express').Response} res - Express response object used to return the list of polls or an error.
  * @returns {Promise<void>}
  */
-export async function getPolls(req, res) {
-    try {
-      const polls = await pollService.getPolls();
-      res.status(200).json(polls);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch polls' });
-    }
-  };
-  /**
+export const getPolls = async (req, res) => {
+  try {
+    const polls = await pollService.getPolls();
+    res.status(200).json(polls);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch polls' });
+  }
+};
+
+/**
  * Controller to get polls created by a specific user.
  *
  * @route GET /polls/created-by/:username
@@ -50,7 +51,7 @@ export async function getPolls(req, res) {
  * @param {import('express').Response} res - Express response object used to return the user's polls or an error.
  * @returns {Promise<void>}
  */
-export async function getPollsByUser(req, res) {
+export const getPollsByUser = async (req, res) => {
   try {
     const { username } = req.params;
 
@@ -75,14 +76,14 @@ export async function getPollsByUser(req, res) {
  * @param {import('express').Response} res - Express response object used to return success or error.
  * @returns {Promise<void>}
  */
-export async function deletePoll(req, res) {
-    try {
-      const { id } = req.params;
-      const { username } = req.body;
-  
-      await pollService.deletePoll(id, username);
-      res.status(204).json({ message: 'Poll deleted successfully' });
-    } catch (err) {
-      res.status(403).json({ error: err.message }); // מחזיר 403 אם המשתמש לא מורשה
-    }
-  };
+export const deletePoll = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { username } = req.body;
+
+    await pollService.deletePoll(id, username);
+    res.status(204).json({ message: 'Poll deleted successfully' });
+  } catch (err) {
+    res.status(403).json({ error: err.message }); // מחזיר 403 אם המשתמש לא מורשה
+  }
+};

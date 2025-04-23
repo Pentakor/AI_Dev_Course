@@ -1,7 +1,8 @@
 // storage/poll.js
-export function __resetStorage() {
+export const __resetStorage = () => {
   polls.clear();
 };
+
 const polls = new Map(); // key: poll.id, value: poll object
 
 /**
@@ -9,7 +10,7 @@ const polls = new Map(); // key: poll.id, value: poll object
  * @param {Object} poll - The poll object to save.
  * @returns {Promise<void>}
  */
-export async function savePoll(poll) {
+export const savePoll = async (poll) => {
   polls.set(poll.id, poll);
 };
 
@@ -18,7 +19,7 @@ export async function savePoll(poll) {
  * @param {string} id - The UUID of the poll.
  * @returns {Promise<Object|null>} The poll if found, or null.
  */
-export async function getPoll(id) {
+export const getPoll = async (id) => {
   return polls.get(id) || null;
 };
 
@@ -27,7 +28,7 @@ export async function getPoll(id) {
  * @param {string} id - The UUID of the poll.
  * @returns {Promise<boolean>} True if deleted, false if not found.
  */
-export async function deletePoll(id) {
+export const deletePoll = async (id) => {
   return polls.delete(id);
 };
 
@@ -35,7 +36,7 @@ export async function deletePoll(id) {
  * Get all polls from storage.
  * @returns {Promise<Object[]>} Array of all poll objects.
  */
-export async function getAllPolls() {
+export const getAllPolls = async () => {
   return Array.from(polls.values());
 };
 
@@ -44,6 +45,6 @@ export async function getAllPolls() {
  * @param {string} username - The creator's username.
  * @returns {Promise<Object[]>} Array of polls created by the user.
  */
-export async function getPollsByCreator(username) {
+export const getPollsByCreator = async (username) => {
   return Array.from(polls.values()).filter(poll => poll.creator === username);
 };

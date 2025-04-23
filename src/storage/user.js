@@ -1,5 +1,5 @@
 // storage/poll.js
-export function __resetStorage() {
+export const __resetStorage = () => {
   users.clear();
 };
 
@@ -11,7 +11,7 @@ const users = new Map();
  * @param {string} username
  * @returns {Promise<string | undefined>}
  */
-export async function getUser(username) {
+export const getUser = async (username) => {
   return users.get(username);
 };
 
@@ -20,7 +20,7 @@ export async function getUser(username) {
  * @param {string} username
  * @returns {Promise<{ username: string }>}
  */
-export async function createUser(username) {
+export const createUser = async (username) => {
   users.set(username, username);
   return { username };
 };
