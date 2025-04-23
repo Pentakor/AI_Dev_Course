@@ -151,7 +151,7 @@ getUser(username): Promise<string | undefined>
 ## 🔁 Team Retrospective
 
 ### Reflections on Collaboration
-We split responsibilities between backend logic, routing, validation and tests. GitHub was used for collaboration, and frequent updates were shared via group chat. Modular design helped us maintain clean separation of concerns and track code ownership.
+We split responsibilities between backend logic, routing, validation and tests. GitHub was used for collaboration, and frequent updates were shared via group chat. Modular design helped us maintain clean separation of concerns and track code ownership. Each member had their own responsibility—whether it was writing tests, designing the architecture, developing specific methods, or integrating everything together—but throughout the process, every member had the opportunity to engage in all aspects of the development.
 
 ### Lessons Learned on AI Usage
 We used **ChatGPT** and **GitHub Copilot** to:
