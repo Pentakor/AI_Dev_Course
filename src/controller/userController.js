@@ -43,12 +43,12 @@ export const voteOnPoll = async (req, res) => {
       res.status(404).json({ error: err.message });
     } else if (
       err.message === "Invalid option index" ||
-      err.message === "User has already voted" ||
+      err.message === "User has already voted" || // Handles duplicate votes
       err.message === "Poll ID is required and must be a string" ||
       err.message === "Username is required and must be a string" ||
       err.message === "Option index is required and must be a non-negative number"
     ) {
-      res.status(400).json({ error: err.message });
+      res.status(400).json({ error: err.message, statusCode: 400 }); // Include statusCode in the response
     } else {
       res.status(500).json({ error: "Internal server error" });
     }

@@ -119,7 +119,11 @@ describe('E2E: User and Poll Flow', () => {
         username: 'Charlie',
         optionId: 0
       })
-    ).rejects.toThrow();
+    ).rejects.toMatchObject({
+      response: {
+        status: 400 // Ensure the status code is 400
+      }
+    });
   });
 
   /**
