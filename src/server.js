@@ -1,18 +1,42 @@
-import app from './app.js';
-/**
- * Application entry point.
- * 
- * Starts the Express server on the specified port.
- */
-const PORT = process.env.PORT || 3000;
+import app from './app.js'; // Ensure app.js defines routes for /users, /polls, etc.
 
-(async () => {
-  try {
-    app.listen(PORT, () => {
+let server;
+
+/**
+ * Starts the Express server.
+ * @returns {Promise<{ baseURL: string }>} The base URL of the running server.
+ */
+export const start = async () => {
+  const PORT = 3000;
+  return new Promise((resolve, reject) => {
+    server = app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
+      resolve({ baseURL: `http://localhost:${PORT}/api` });
+    }).on('error', (error) => {
+      console.error('Error starting the server:', error);
+      reject(error);
     });
-  } catch (error) {
-    console.error('Error starting the server:', error);
-    process.exit(1);
+  });
+};
+
+/**
+ * Stops the Express server.
+ * @returns {Promise<void>}
+ */
+export const stop = async () => {
+  if (!server) {
+    console.warn('Server is not running.');
+    return;
   }
-})();
+  return new Promise((resolve, reject) => {
+    server.close((error) => {
+      if (error) {
+        console.error('Error stopping the server:', error);
+        reject(error);
+      } else {
+        console.log('Server stopped successfully');
+        resolve();
+      }
+    });
+  });
+};

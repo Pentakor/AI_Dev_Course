@@ -5,9 +5,8 @@
  */
 
 import axios from 'axios';
-import app from '../src/app.js';
+import { start, stop } from '../src/server.js';
 
-let server;
 let baseURL;
 
 /**
@@ -19,11 +18,14 @@ let baseURL;
  * @async
  */
 beforeAll(async () => {
-  const PORT = 3000; // Use a test-specific port
-  server = app.listen(PORT, () => {
-    console.log(`Test server is running on port ${PORT}`);
-  });
-  baseURL = `http://localhost:${PORT}/api`;
+  try {
+    const serverInfo = await start();
+    baseURL = serverInfo.baseURL;
+    console.log(`Base URL for tests: ${baseURL}`); // Log the base URL
+  } catch (error) {
+    console.error('Error starting the server for tests:', error);
+    throw error;
+  }
 });
 
 /**
@@ -34,19 +36,7 @@ beforeAll(async () => {
  * @async
  */
 afterAll(async () => {
-  if (server) {
-    await new Promise((resolve, reject) => {
-      server.close((error) => {
-        if (error) {
-          console.error('Error stopping the test server:', error);
-          reject(error);
-        } else {
-          console.log('Test server stopped successfully');
-          resolve();
-        }
-      });
-    });
-  }
+  await stop();
 });
 
 describe('E2E: User and Poll Flow', () => {
@@ -56,6 +46,7 @@ describe('E2E: User and Poll Flow', () => {
    * @test
    */
   test('Create user', async () => {
+    console.log(`Requesting: ${baseURL}/users`); // Log the request URL
     const res = await axios.post(`${baseURL}/users`, { username: 'Alice' });
     expect(res.status).toBe(201);
   });
