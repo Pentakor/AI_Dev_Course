@@ -52,6 +52,20 @@ describe('E2E: User and Poll Flow', () => {
   });
 
   /**
+ * Test: Fail to create user without a username. 
+ * @test
+ */
+test('Fail to create user without a username', async () => {
+  await expect(
+    axios.post(`${baseURL}/users`, {})
+  ).rejects.toMatchObject({
+    response: {
+      status: 400
+    }
+  });
+});
+
+  /**
    * Test: Successfully creates a poll for the user.
    * @test
    */
@@ -64,6 +78,26 @@ describe('E2E: User and Poll Flow', () => {
     expect(res.status).toBe(201);
     expect(res.data).toHaveProperty('id');
   });
+
+   /**
+   * Test: Fail to create poll with numeric question (invalid type). 
+   * @test
+   */
+ test('Fail to create poll with numeric question', async () => {
+  await axios.post(`${baseURL}/users`, { username: 'NumericPollCreator' });
+
+  await expect(
+    axios.post(`${baseURL}/polls`, {
+      creator: 'NumericPollCreator',
+      question: 12345,
+      options: ['Yes', 'No']
+    })
+  ).rejects.toMatchObject({
+    response: {
+      status: 400
+    }
+   });
+ });
 
   /**
    * Test: A valid user successfully votes on an existing poll.
@@ -85,6 +119,32 @@ describe('E2E: User and Poll Flow', () => {
     });
     expect(res.status).toBe(200);
   });
+
+  /**
+ * Test: Fail to vote with optionId as a string. 
+ * @test
+ */
+test('Fail to vote with string as optionId', async () => {
+  await axios.post(`${baseURL}/users`, { username: 'StrOptionUser' });
+
+  const poll = await axios.post(`${baseURL}/polls`, {
+    creator: 'StrOptionUser',
+    question: 'Test optionId type',
+    options: ['A', 'B']
+  });
+  const pollId = poll.data.id;
+
+  await expect(
+    axios.post(`${baseURL}/users/vote/${pollId}`, {
+      username: 'StrOptionUser',
+      optionId: 'zero'
+    })
+  ).rejects.toMatchObject({
+    response: {
+      status: 400
+    }
+  });
+});
 
   /**
    * Test: Prevents duplicate voting by the same user on the same poll.
