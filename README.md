@@ -1,46 +1,163 @@
-Name: David Weiss
-ID: 325483006
+# PollSystem+ — EX2.2
 
-# Polls Library
+This is a multi-user polling system built with Node.js and Express. It supports user management, poll creation, voting, and retrieving results — all in-memory, with fully documented API and internal architecture.
 
-## Summary
-This application provides a library for creating and managing polls. It allows users to:
-- Create polls with a question and multiple options.
-- Cast votes for specific options in a poll.
-- Retrieve poll data, including the question, total votes, and voting results.
+---
 
-The library is implemented using two main classes:
-1. `Poll`: Represents an individual poll with a question and options.
-2. `PollsLibrary`: Manages multiple polls and provides methods for interacting with them.
+## 👥 Team Info
 
-## Design Decisions and Assumptions
-1. **Handling Duplicate Polls**: 
-   - A poll is uniquely identified by its question. Attempting to create a poll with the same question as an existing poll will throw an error.
+- **Lahav Rabinovitz** — 209028349
+- **Sapir Levi** — 318776010
+- **Adam Takrury** — 322907247
+- **Irad Amsalem** - 209363639
+- **David Weiss** - 325483006
 
-2. **Handling Duplicate Options**:
-   - Poll options must be unique. If duplicate options are provided during poll creation, an error will be thrown.
+---
 
-3. **Validation**:
-   - A poll must have a non-empty question.
-   - A poll must have at least two unique options.
-   - Voting is only allowed for valid options in an existing poll.
+## 💡 Design Assumptions
 
-4. **Private Data**:
-   - The library uses private fields (e.g., `#polls`, `#options`) to encapsulate data and ensure it cannot be accessed or modified directly.
+- All data is stored in memory using JavaScript Maps (no external DB).
+- Each user is uniquely identified by their username.
+- A poll contains a question and at least two unique, non-empty options.
+- Votes are recorded as a map of `username → option index`.
+- A user may only vote once per poll.
+- Only the poll creator is authorized to delete their poll.
+- Zod is used for request validation on API endpoints.
 
-5. **Error Handling**:
-   - Errors are thrown for invalid operations, such as voting on a non-existent poll or retrieving a poll that does not exist.
+---
 
-## Running Tests
-The application includes comprehensive tests for basic functionality, edge cases, and combinations. To run the tests, use the following command:
-```sh
-npm test
+## 📚 API Summary
+
+### User Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST   | `/api/users` | Create a new user |
+| POST   | `/api/users/vote/:id` | Submit a vote for a poll |
+| GET    | `/api/users/voted-by/:username` | Get polls a user has voted in |
+
+### Poll Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST   | `/api/polls` | Create a new poll |
+| GET    | `/api/polls` | Get all polls |
+| GET    | `/api/polls/created-by/:username` | Get polls created by a user |
+| DELETE | `/api/polls/:id` | Delete a poll (by creator only) |
+
+### Example Request/Response
+
+#### POST `/api/users`
+
+**Request body:**
+```json
+{ "username": "alice" }
 ```
 
-## AI Tools Usage
-During the development of this project, I utilized ChatGPT and GitHub Copilot for the next needs:
+**Response:**
+```json
+{ "message": "User created", "user": { "username": "alice" } }
+```
 
-   - suggestions for syntax corrections.
-   - debugging issues by explaining error messages and suggesting fixes.
-   - writing comprehensive tests with Jest.
-   - Assisted in drafting and refining documentation, including this `README.md`, to ensure clarity and completeness.
+#### POST `/api/polls`
+
+**Request body:**
+```json
+{
+  "creator": "alice",
+  "question": "What is your favorite programming language?",
+  "options": ["JavaScript", "Python", "Java"]
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Poll created",
+  "poll": {
+    "id": "12345",
+    "creator": "alice",
+    "question": "What is your favorite programming language?",
+    "options": ["JavaScript", "Python", "Java"],
+    "votes": {}
+  }
+}
+```
+
+#### POST `/api/users/vote/:id`
+
+**Request body:**
+```json
+{
+  "username": "bob",
+  "optionId": 1
+}
+```
+
+**Response:**
+```json
+{ "message": "Vote recorded" }
+```
+
+#### DELETE `/api/polls/:id`
+
+**Request body:**
+```json
+{ "username": "alice" }
+```
+
+**Response:**
+```json
+{ "message": "Poll deleted" }
+```
+
+---
+
+## 🔧 Interface Contracts
+
+### User Service
+```ts
+createUser(username: string): Promise<{ username: string }>
+getUser(username: string): Promise<string | undefined>
+voteOnPoll(id: string, username: string, optionId: number): Promise<Poll>
+getVotedPollsByUser(username: string): Promise<Poll[]>
+```
+
+### Poll Service
+```ts
+createPoll({ creator, question, options }): Promise<Poll>
+getPolls(): Promise<Poll[]>
+getPollsByUser(username: string): Promise<Poll[]>
+deletePoll(id: string, username: string): Promise<void>
+```
+
+### Poll Storage Interface
+```ts
+savePoll(poll): Promise<void>
+getPoll(id): Promise<Poll | null>
+deletePoll(id): Promise<boolean>
+getAllPolls(): Promise<Poll[]>
+getPollsByCreator(username): Promise<Poll[]>
+```
+
+### User Storage Interface
+```ts
+createUser(username): Promise<{ username: string }>
+getUser(username): Promise<string | undefined>
+```
+
+---
+
+## 🔁 Team Retrospective
+
+### Reflections on Collaboration
+We split responsibilities between backend logic, routing, validation and tests. GitHub was used for collaboration, and frequent updates were shared via group chat. Modular design helped us maintain clean separation of concerns and track code ownership. Each member had their own responsibility—whether it was writing tests, designing the architecture, developing specific methods, or integrating everything together—but throughout the process, every member had the opportunity to engage in all aspects of the development.
+
+### Lessons Learned on AI Usage
+We used **ChatGPT** and **GitHub Copilot** to:
+- Refactor files for modularity and readability
+- Add and correct JSDoc documentation
+- Structure Zod schema validation
+- Generate and validate API documentation
+
+The AI helped with speed and quality, but we made final architectural decisions and validations ourselves.
